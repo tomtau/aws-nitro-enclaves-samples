@@ -83,34 +83,37 @@ pub fn server(args: ServerArgs) -> Result<(), String> {
     let port2 = args.port2;
     std::thread::spawn(move || {
         let sockaddr = SockAddr::new_vsock(VSOCK_PROXY_CID, port2);
-        if let Ok(listener) = VsockListener::bind(&sockaddr) {
-            println!("port2 bound listener");
-            for conn in listener.incoming() {
-                if let Ok(mut stream) = conn {
-                    println!("got conn on port2");
-                    dbg!(stream.write_all(&[0,0,0]));
+        loop {
+            if let Ok(listener) = VsockListener::bind(&sockaddr) {
+                println!("port2 bound listener");
+                for conn in listener.incoming() {
+                    if let Ok(mut stream) = conn {
+                        println!("got conn on port2");
+                        dbg!(stream.write_all(&[0,0,0]));
 
-                    let mut buffer = [0u8; BUFF_SIZE];
-                
-                    loop {
-                        let nbytes = stream.read(&mut buffer);
-                        let nbytes = match nbytes {
-                            Err(_) => 0,
-                            Ok(n) => n,
-                        };
+                        let mut buffer = [0u8; BUFF_SIZE];
                     
-                        if nbytes > 0 {
-                            println!("port2 read: {:02X?}", &buffer[..nbytes]);
-                        } else {
-                            std::thread::sleep(std::time::Duration::new(1, 0));
-                        };
+                        loop {
+                            let nbytes = stream.read(&mut buffer);
+                            let nbytes = match nbytes {
+                                Err(_) => 0,
+                                Ok(n) => n,
+                            };
+                        
+                            if nbytes > 0 {
+                                println!("port2 read: {:02X?}", &buffer[..nbytes]);
+                            } else {
+                                std::thread::sleep(std::time::Duration::new(1, 0));
+                            };
+                        }
+                    } else {
+                        println!("error getting conn on port2");
                     }
-                } else {
-                    println!("error getting conn on port2");
                 }
+            } else {
+                println!("port2 bound listener failed");
+                std::thread::sleep(std::time::Duration::new(1, 0));
             }
-        } else {
-            println!("port2 bound listener failed");
         }
 
     });
