@@ -83,6 +83,7 @@ pub fn server(args: ServerArgs) -> Result<(), String> {
     let port2 = args.port2;
     std::thread::spawn(move || {
         let sockaddr = SockAddr::new_vsock(VSOCK_PROXY_CID, port2);
+        dbg!(port2);
         loop {
             match VsockListener::bind(&sockaddr) {
                 Ok(listener) => {
@@ -120,6 +121,7 @@ pub fn server(args: ServerArgs) -> Result<(), String> {
         }
     });
     let sockaddr = SockAddr::new_vsock(VSOCK_PROXY_CID, args.port1);
+    dbg!(args.port1);
     if let Ok(listener) = VsockListener::bind(&sockaddr) {
         println!("port1 bound listener");
         for conn in listener.incoming() {
