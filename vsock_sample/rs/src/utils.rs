@@ -46,7 +46,7 @@ macro_rules! create_app {
                     .about("Connect to given ports.")
                     .arg(
                         Arg::with_name("port1")
-                      1      .long("port1")
+                            .long("port1")
                             .help("port")
                             .takes_value(true)
                             .required(true),
