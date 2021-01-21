@@ -39,7 +39,7 @@ macro_rules! create_app {
                             .help("port")
                             .takes_value(true)
                             .required(true),
-                    ),,
+                    ),
             )
             .subcommand(
                 SubCommand::with_name("client")
