@@ -25,29 +25,36 @@ macro_rules! create_app {
             .version(env!("CARGO_PKG_VERSION"))
             .subcommand(
                 SubCommand::with_name("server")
-                    .about("Listen on a given port.")
+                    .about("Listen on given ports.")
                     .arg(
-                        Arg::with_name("port")
-                            .long("port")
-                            .help("port")
-                            .takes_value(true)
-                            .required(true),
-                    ),
-            )
-            .subcommand(
-                SubCommand::with_name("client")
-                    .about("Connect to a given cid and port.")
-                    .arg(
-                        Arg::with_name("port")
-                            .long("port")
+                        Arg::with_name("port1")
+                            .long("port1")
                             .help("port")
                             .takes_value(true)
                             .required(true),
                     )
                     .arg(
-                        Arg::with_name("cid")
-                            .long("cid")
-                            .help("cid")
+                        Arg::with_name("port2")
+                            .long("port2")
+                            .help("port")
+                            .takes_value(true)
+                            .required(true),
+                    ),,
+            )
+            .subcommand(
+                SubCommand::with_name("client")
+                    .about("Connect to given ports.")
+                    .arg(
+                        Arg::with_name("port1")
+                      1      .long("port1")
+                            .help("port")
+                            .takes_value(true)
+                            .required(true),
+                    )
+                    .arg(
+                        Arg::with_name("port2")
+                            .long("port2")
+                            .help("port")
                             .takes_value(true)
                             .required(true),
                     ),
