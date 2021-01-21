@@ -37,7 +37,7 @@ fn parse_ports(args: &ArgMatches) -> Result<(u32, u32), String> {
         .value_of("port1")
         .ok_or("Could not find port argument")?;
     let port2 = args
-        .value_of("port1")
+        .value_of("port2")
         .ok_or("Could not find port argument")?;
     let p1 = port1
         .parse()
