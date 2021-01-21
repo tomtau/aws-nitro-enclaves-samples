@@ -10,9 +10,9 @@ use nix::sys::socket::{accept, bind, connect, shutdown, socket};
 use nix::sys::socket::{AddressFamily, Shutdown, SockAddr, SockFlag, SockType};
 use nix::unistd::close;
 use std::convert::TryInto;
+use std::io::{Read, Write};
 use std::os::unix::io::{AsRawFd, RawFd};
 use vsock::{VsockListener, VsockStream};
-use std::io::{Read, Write};
 
 const VSOCK_PROXY_CID: u32 = 3;
 const BUF_MAX_LEN: usize = 8192;
@@ -65,11 +65,11 @@ pub fn client(args: ClientArgs) -> Result<(), String> {
             Err(_) => 0,
             Ok(n) => n,
         };
-    
+
         if nbytes > 0 {
             println!("vsock1 read: {:02X?}", &buffer[..nbytes]);
-            dbg!(vsocket2.write_all(&[1,1,1,1]));
-            dbg!(vsocket1.write_all(&[2,2,2,2,2]));
+            dbg!(vsocket2.write_all(&[1, 1, 1, 1]));
+            dbg!(vsocket1.write_all(&[2, 2, 2, 2, 2]));
         } else {
             std::thread::sleep(std::time::Duration::new(1, 0));
         };
@@ -84,38 +84,40 @@ pub fn server(args: ServerArgs) -> Result<(), String> {
     std::thread::spawn(move || {
         let sockaddr = SockAddr::new_vsock(VSOCK_PROXY_CID, port2);
         loop {
-            if let Ok(listener) = VsockListener::bind(&sockaddr) {
-                println!("port2 bound listener");
-                for conn in listener.incoming() {
-                    if let Ok(mut stream) = conn {
-                        println!("got conn on port2");
-                        dbg!(stream.write_all(&[0,0,0]));
+            match VsockListener::bind(&sockaddr) {
+                Ok(listener) => {
+                    println!("port2 bound listener");
+                    for conn in listener.incoming() {
+                        if let Ok(mut stream) = conn {
+                            println!("got conn on port2");
+                            dbg!(stream.write_all(&[0, 0, 0]));
 
-                        let mut buffer = [0u8; BUFF_SIZE];
-                    
-                        loop {
-                            let nbytes = stream.read(&mut buffer);
-                            let nbytes = match nbytes {
-                                Err(_) => 0,
-                                Ok(n) => n,
-                            };
-                        
-                            if nbytes > 0 {
-                                println!("port2 read: {:02X?}", &buffer[..nbytes]);
-                            } else {
-                                std::thread::sleep(std::time::Duration::new(1, 0));
-                            };
+                            let mut buffer = [0u8; BUFF_SIZE];
+
+                            loop {
+                                let nbytes = stream.read(&mut buffer);
+                                let nbytes = match nbytes {
+                                    Err(_) => 0,
+                                    Ok(n) => n,
+                                };
+
+                                if nbytes > 0 {
+                                    println!("port2 read: {:02X?}", &buffer[..nbytes]);
+                                } else {
+                                    std::thread::sleep(std::time::Duration::new(1, 0));
+                                };
+                            }
+                        } else {
+                            println!("error getting conn on port2");
                         }
-                    } else {
-                        println!("error getting conn on port2");
                     }
                 }
-            } else {
-                println!("port2 bound listener failed");
-                std::thread::sleep(std::time::Duration::new(1, 0));
+                Err(e) => {
+                    println!("port2 bound listener failed: {:?}", e);
+                    std::thread::sleep(std::time::Duration::new(1, 0));
+                }
             }
         }
-
     });
     let sockaddr = SockAddr::new_vsock(VSOCK_PROXY_CID, args.port1);
     if let Ok(listener) = VsockListener::bind(&sockaddr) {
@@ -125,16 +127,16 @@ pub fn server(args: ServerArgs) -> Result<(), String> {
                 println!("got conn on port1");
 
                 let mut buffer = [0u8; BUFF_SIZE];
-            
+
                 loop {
-                    dbg!(stream.write_all(&[3,3,3,3,3,3]));
+                    dbg!(stream.write_all(&[3, 3, 3, 3, 3, 3]));
 
                     let nbytes = stream.read(&mut buffer);
                     let nbytes = match nbytes {
                         Err(_) => 0,
                         Ok(n) => n,
                     };
-                
+
                     if nbytes > 0 {
                         println!("port1 read: {:02X?}", &buffer[..nbytes]);
                     } else {

@@ -9,10 +9,7 @@ pub struct ServerArgs {
 impl ServerArgs {
     pub fn new_with(args: &ArgMatches) -> Result<Self, String> {
         let (port1, port2) = parse_ports(args)?;
-        Ok(ServerArgs {
-            port1,
-            port2,
-        })
+        Ok(ServerArgs { port1, port2 })
     }
 }
 
@@ -25,10 +22,7 @@ pub struct ClientArgs {
 impl ClientArgs {
     pub fn new_with(args: &ArgMatches) -> Result<Self, String> {
         let (port1, port2) = parse_ports(args)?;
-        Ok(ClientArgs {
-            port1,
-            port2,
-        })
+        Ok(ClientArgs { port1, port2 })
     }
 }
 
@@ -45,9 +39,11 @@ fn parse_ports(args: &ArgMatches) -> Result<(u32, u32), String> {
     let port2 = args
         .value_of("port1")
         .ok_or("Could not find port argument")?;
-    let p1 = port1.parse()
+    let p1 = port1
+        .parse()
         .map_err(|_err| "port is not a number".to_string())?;
-    let p2 = port2.parse()
-    .map_err(|_err| "port is not a number".to_string())?;
+    let p2 = port2
+        .parse()
+        .map_err(|_err| "port is not a number".to_string())?;
     Ok((p1, p2))
 }
