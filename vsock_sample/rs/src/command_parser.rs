@@ -2,28 +2,32 @@ use clap::ArgMatches;
 
 #[derive(Debug, Clone)]
 pub struct ServerArgs {
-    pub port: u32,
+    pub port1: u32,
+    pub port2: u32,
 }
 
 impl ServerArgs {
     pub fn new_with(args: &ArgMatches) -> Result<Self, String> {
+        let (port1, port2) = parse_ports(args)?;
         Ok(ServerArgs {
-            port: parse_port(args)?,
+            port1,
+            port2,
         })
     }
 }
 
 #[derive(Debug, Clone)]
 pub struct ClientArgs {
-    pub cid: u32,
-    pub port: u32,
+    pub port1: u32,
+    pub port2: u32,
 }
 
 impl ClientArgs {
     pub fn new_with(args: &ArgMatches) -> Result<Self, String> {
+        let (port1, port2) = parse_ports(args)?;
         Ok(ClientArgs {
-            cid: parse_cid_client(args)?,
-            port: parse_port(args)?,
+            port1,
+            port2,
         })
     }
 }
@@ -34,10 +38,16 @@ fn parse_cid_client(args: &ArgMatches) -> Result<u32, String> {
         .map_err(|_err| "cid is not a number".to_string())
 }
 
-fn parse_port(args: &ArgMatches) -> Result<u32, String> {
-    let port = args
-        .value_of("port")
+fn parse_ports(args: &ArgMatches) -> Result<(u32, u32), String> {
+    let port1 = args
+        .value_of("port1")
         .ok_or("Could not find port argument")?;
-    port.parse()
-        .map_err(|_err| "port is not a number".to_string())
+    let port2 = args
+        .value_of("port1")
+        .ok_or("Could not find port argument")?;
+    let p1 = port1.parse()
+        .map_err(|_err| "port is not a number".to_string())?;
+    let p2 = port2.parse()
+    .map_err(|_err| "port is not a number".to_string())?;
+    Ok((p1, p2))
 }

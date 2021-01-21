@@ -85,9 +85,9 @@ dependencies = [
 
 [[package]]
 name = "nix"
-version = "0.15.0"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b2e0b4f3320ed72aaedb9a5ac838690a8047c7b275da22711fddff4f8a14229"
+checksum = "50e4785f2c3b7589a0d0c1dd60285e1188adac4006e8abd6dd578e1567027363"
 dependencies = [
  "bitflags",
  "cc",
@@ -130,6 +130,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a02e4885ed3bc0f2de90ea6dd45ebcbb66dacffe03547fadbb0eeae2770887d"
 
 [[package]]
+name = "vsock"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dba063357047c0f2216c7c653879ea4e5e198d0c3cde7efa37ebfd9039b48491"
+dependencies = [
+ "libc",
+ "nix",
+]
+
+[[package]]
 name = "vsock-sample"
 version = "0.1.0"
 dependencies = [
@@ -137,6 +147,7 @@ dependencies = [
  "clap",
  "log",
  "nix",
+ "vsock",
 ]
 
 [[package]]
